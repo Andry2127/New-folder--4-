@@ -4,29 +4,31 @@ import uvicorn
 import db 
 
 app = FastAPI()
+users = []
+
+@app.get("/get_users/")
+def get_users():
+    return {"users": users}
 
 
-@app.get("/")
-async def index():
-    return dict(msg="Welcome to our system")
-
-
-@app.post("/add_data/")
-async def add_data(name: str = Query(), data: str = Query()):
+@app.post("/add_user/")
+def add_data(name: str = Query()):
     if name not in db.data:
-        db.data.update({name: data})
+        users.append(name)
         return dict(msg="Data is succesfully saved")
-    else:
-        return dict(msg="Data is already exist")
 
 
-@app.get("/data/")
-async def get_data():
-    return dict(data=db.data, msg="All the data is shown here")
+@app.delete("/delete_user/")
+def del_data(name: str = Query()):
+    if name not in users:
+        return dict(msg="name does not exists")
+    users.remove(name)
+    return dict(msg="name is deleted")
 
 
 if __name__ == "__main__":
     uvicorn.run("main:app")
+
 
 
     
